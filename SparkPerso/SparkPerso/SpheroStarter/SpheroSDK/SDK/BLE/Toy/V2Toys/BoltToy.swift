@@ -24,6 +24,8 @@ class BoltToy: SpheroV2Toy {
         }
     }
     
+    public var isShaked: Bool = false
+    
     func setMainLed(color: UIColor) {
         setMatrix(color: color)
     }

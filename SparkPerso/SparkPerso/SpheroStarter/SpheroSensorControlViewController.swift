@@ -46,22 +46,129 @@ class SpheroSensorControlViewController: UIViewController {
         movementData[.Rond] = []
         movementData[.Triangle] = []
         
+        startSensorMode(bolt: SharedToyBox.instance.bolts[0])
+        startSensorMode(bolt: SharedToyBox.instance.bolts[1])
+        startSensorMode(bolt: SharedToyBox.instance.bolts[2])
+        
+        SharedToyBox.instance.bolts[0].setMainLed(color: .yellow)
+        SharedToyBox.instance.bolts[1].setMainLed(color: .cyan)
+        SharedToyBox.instance.bolts[2].setMainLed(color: .brown)
+        
+//        var currentAccData = [Double]()
+//        var currentGyroData = [Double]()
+//
+//        SharedToyBox.instance.bolt?.sensorControl.enable(sensors: SensorMask.init(arrayLiteral: .accelerometer,.gyro))
+//        SharedToyBox.instance.bolt?.sensorControl.interval = 1
+//        SharedToyBox.instance.bolt?.setStabilization(state: SetStabilization.State.off)
+        
+        
+//        SharedToyBox.instance.bolts[0].sensorControl.onDataReady = { data in
+//            DispatchQueue.main.async {
+//
+//                if self.isRecording || self.isPredicting {
+//
+//
+//
+//
+//                    if let acceleration = data.accelerometer?.filteredAcceleration {
+//                        // PAS BIEN!!!
+//                        currentAccData.append(contentsOf: [acceleration.x!, acceleration.y!, acceleration.z!])
+////                        if acceleration.x! >= 0.65 {
+////                            print("droite")
+////                        }else if acceleration.x! <= -0.65 {
+////                            print("gauche")
+////                        }
+//                        let absSum = abs(acceleration.x!)+abs(acceleration.y!)+abs(acceleration.z!)
+//
+//                        if absSum > 14 {
+//                            print("Secousse \(absSum)")
+//                        }else{
+//                            //print("IDLE")
+//                        }
+//                        let dataToDisplay: double3 = [acceleration.x!, acceleration.y!, acceleration.z!]
+//                        self.acceleroChart.add(dataToDisplay)
+//                    }
+//
+//                    if let gyro = data.gyro?.rotationRate {
+//                        // TOUJOURS PAS BIEN!!!
+//                        let rotationRate: double3 = [Double(gyro.x!)/2000.0, Double(gyro.y!)/2000.0, Double(gyro.z!)/2000.0]
+//                        currentGyroData.append(contentsOf: [Double(gyro.x!), Double(gyro.y!), Double(gyro.z!)])
+//                        self.gyroChart.add(rotationRate)
+//                    }
+//                    /*
+//                    if currentAccData.count+currentGyroData.count >= 3600 {
+//                        print("Data ready for network!")
+//                        if self.isRecording {
+//                            self.isRecording = false
+//
+//                            // Normalisation
+//                            let minAcc = currentAccData.min()!
+//                            let maxAcc = currentAccData.max()!
+//                            let normalizedAcc = currentAccData.map { ($0 - minAcc) / (maxAcc - minAcc) }
+//
+//                            let minGyr = currentGyroData.min()!
+//                            let maxGyr = currentGyroData.max()!
+//                            let normalizedGyr = currentGyroData.map { ($0 - minGyr) / (maxGyr - minGyr) }
+//
+//                            self.movementData[self.selectedClass]?.append(normalizedAcc)
+//                            currentAccData = []
+//                            currentGyroData = []
+//                        }
+//                        if self.isPredicting {
+//                            self.isPredicting = false
+//
+//                            // Normalisation
+//                            let minAcc = currentAccData.min()!
+//                            let maxAcc = currentAccData.max()!
+//                            let normalizedAcc = currentAccData.map { Float(($0 - minAcc) / (maxAcc - minAcc)) }
+//                            let minGyr = currentGyroData.min()!
+//                            let maxGyr = currentGyroData.max()!
+//                            let normalizedGyr = currentGyroData.map { Float(($0 - minGyr) / (maxGyr - minGyr)) }
+//
+//                            let prediction = try! self.neuralNet?.update(inputs: normalizedAcc)
+//
+//                            let index = prediction?.index(of: (prediction?.max()!)!)! // [0.89,0.03,0.14]
+//
+//
+//                            let recognizedClass = Classes(rawValue: index!)!
+//                            print(recognizedClass)
+//                            print(prediction!)
+//
+//                            var str = "Je pense que c'est un "
+//                            switch recognizedClass {
+//                            case .Carre: str = str+"carré!"
+//                            case .Rond: str = str+"rond!"
+//                            case .Triangle: str = str+"triangle!"
+//                            }
+//                            let utterance = AVSpeechUtterance(string: str)
+//                            utterance.voice = AVSpeechSynthesisVoice(language: "fr-Fr")
+//                            utterance.rate = 0.4
+//
+//                            let synthesizer = AVSpeechSynthesizer()
+//                            synthesizer.speak(utterance)
+//                            currentAccData = []
+//                            currentGyroData = []
+//                        }
+//                    }
+// */
+//                }
+//            }
+//        }
+        
+    }
+    
+    func startSensorMode(bolt: BoltToy) {
         var currentAccData = [Double]()
         var currentGyroData = [Double]()
         
-        SharedToyBox.instance.bolt?.sensorControl.enable(sensors: SensorMask.init(arrayLiteral: .accelerometer,.gyro))
-        SharedToyBox.instance.bolt?.sensorControl.interval = 1
-        SharedToyBox.instance.bolt?.setStabilization(state: SetStabilization.State.off)
+        bolt.sensorControl.enable(sensors: SensorMask.init(arrayLiteral: .accelerometer,.gyro))
+        bolt.sensorControl.interval = 1
+        bolt.setStabilization(state: SetStabilization.State.off)
         
         
-        SharedToyBox.instance.bolts[0].sensorControl.onDataReady = { data in
+        bolt.sensorControl.onDataReady = { data in
             DispatchQueue.main.async {
-                
                 if self.isRecording || self.isPredicting {
-                    
-                   
-                    
-                    
                     if let acceleration = data.accelerometer?.filteredAcceleration {
                         // PAS BIEN!!!
                         currentAccData.append(contentsOf: [acceleration.x!, acceleration.y!, acceleration.z!])
@@ -72,9 +179,14 @@ class SpheroSensorControlViewController: UIViewController {
 //                        }
                         let absSum = abs(acceleration.x!)+abs(acceleration.y!)+abs(acceleration.z!)
                         
-                        if absSum > 14 {
+                        if absSum > 3 {
+                            bolt.isShaked = true
+//                            bolt.onCollisionDetected = absSum
+                            self.checkContact()
+                            //print("Attention ça secoue chez \(bolt.peripheral?.name)")
                             print("Secousse \(absSum)")
                         }else{
+                            bolt.isShaked = false
                             //print("IDLE")
                         }
                         let dataToDisplay: double3 = [acceleration.x!, acceleration.y!, acceleration.z!]
@@ -146,9 +258,17 @@ class SpheroSensorControlViewController: UIViewController {
                 }
             }
         }
-        
     }
     
+    func checkContact() {
+        if SharedToyBox.instance.bolts[0].isShaked && SharedToyBox.instance.bolts[1].isShaked && SharedToyBox.instance.bolts[2].isShaked {
+            print("Oh mais ça a touché la")
+//            SocketIOManager.instance.writeValue(<#T##value: String##String#>, toChannel: <#T##String#>, callBack: <#T##() -> ()#>)
+            for bolt in SharedToyBox.instance.bolts {
+                bolt.setMainLed(color: .green)
+            }
+        }
+    }
     
     @IBAction func trainButtonClicked(_ sender: Any) {
         
